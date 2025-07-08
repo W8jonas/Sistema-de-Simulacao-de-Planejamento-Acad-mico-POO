@@ -61,7 +61,8 @@ simulador-planejamento-academico/
 ```
 
 Diagrama de classes do projeto:
-![Diagrama](/Documentation/class-diagram.svg)
+[Diagrama online no mermaid](https://www.mermaidchart.com/app/projects/a4e50a87-5301-4d4a-b4f5-64624b5565c8/diagrams/9d2acef6-a724-4817-81fc-8f849d2f6147/version/v0.1/edit)
+
 ```mermaid
 classDiagram
 namespace dominio {
