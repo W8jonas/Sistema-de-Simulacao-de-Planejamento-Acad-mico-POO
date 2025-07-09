@@ -77,7 +77,6 @@ namespace dominio {
         -String nome
         -int cargaHorariaSemanal
         -Set~ValidadorPreRequisito~ validadores
-        -Set~Disciplina~ coRequisitos
         +boolean requisitosAtendidos(Aluno)
     }
     class DisciplinaObrigatoria
@@ -103,7 +102,7 @@ namespace dominio {
     class Aluno {
         -String nome
         -String matricula
-        -Map~Disciplina,int~ historicoNotas
+        -List~Disciplina~ historicoNotas
         -Set~Turma~ planejamento
         +boolean concluiu(Disciplina)
         +int cargaHorariaPlanejada()
@@ -130,7 +129,6 @@ ValidadorPreRequisito <|.. ValidadorLogicoAND
 ValidadorPreRequisito <|.. ValidadorLogicoOR
 
 Disciplina "1" o-- "*" ValidadorPreRequisito
-Disciplina "1" o-- "*" Disciplina : coRequisitos
 
 namespace repository {
     class Repositorio {
@@ -170,21 +168,9 @@ namespace view {
     class LoggerSimulacao {
         +void info(String)
         +void warn(String)
+        +void error(String)
     }
 }
 ServicoMatricula --> RelatorioSimulacao
 ServicoMatricula --> LoggerSimulacao
-
-namespace util {
-    class JsonUtil {
-        +<T> T fromJson(String, Class~T~)
-        +String toJson(Object)
-    }
-    class Arquivo {
-        +String ler(String caminho)
-        +void escrever(String caminho, String conteudo)
-    }
-}
-JsonUtil --> Arquivo
-Repositorio --> JsonUtil
 ```
