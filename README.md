@@ -20,42 +20,24 @@ simulador-planejamento-academico/
  │  │            │    │    ├─ Turma.java
  │  │            │    │    ├─ Aluno.java
  │  │            │    │    └─ Horario.java
- │  │            │    │  
+ │  │            │    │
  │  │            │    └─ validator/
  │  │            │         ├─ ValidadorPreRequisito.java
  │  │            │         ├─ ValidadorSimples.java
  │  │            │         ├─ ValidadorLogicoAND.java
  │  │            │         └─ ValidadorLogicoOR.java
- │  │            │    
- │  │            ├─ repository/
- │  │            │    ├─ ISubject.java
- │  │            │    ├─ IStudent.java
- │  │            │    ├─ IClass.java
- │  │            │    │
- │  │            │    └─ jsonFile/
- │  │            │         ├─ File.java
- │  │            │         ├─ Subject.java
- │  │            │         ├─ Student.java
- │  │            │         ├─ Class.java
  │  │            │
  │  │            ├─ services/   # Usar para dividir a função principal em blocos menores
  │  │            │    ├─ VerifyDependencies.java
  │  │            │
- │  │            ├─ controller/ # Entrada do programa
- │  │            │    └─ ServicoMatricula.java
- │  │            │
- │  │            ├─ view/
- │  │            │    ├─ RelatorioSimulacao.java
- │  │            │    └─ LoggerSimulacao.java
- │  │            │
- │  │            └─ util/
- │  │                 └─ JsonUtil.java
- │  │
+ │  │            └─ controller/ # Entrada do programa
+ │  │                 └─ ServicoMatricula.java
+ │  │            
  │  ├─ resources/
- │  │     └─ data/
- │  │          ├─ disciplinas.json
- │  │          ├─ turmas.json
- │  │          └─ alunos.json
+ │  │    ├─ Subjects.java
+ │  │    ├─ Classes.java
+ │  │    └─ Students.java
+ │  │    
  │  └─ test/
  │       ├─ java/
  │       │    └─ simulador/
