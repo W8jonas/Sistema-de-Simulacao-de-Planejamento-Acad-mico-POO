@@ -66,9 +66,9 @@ namespace dominio {
     class DisciplinaOptativa
 
     class Horario {
-        -DiaSemana dia
-        -LocalTime inicio
-        -LocalTime fim
+        -int dia
+        -int inicio
+        -int fim
         +boolean conflitaCom(Horario)
     }
 
@@ -112,21 +112,6 @@ ValidadorPreRequisito <|.. ValidadorLogicoOR
 
 Disciplina "1" o-- "*" ValidadorPreRequisito
 
-namespace repository {
-    class Repositorio {
-        <<interface>>
-        +void salvar(T)
-        +T carregar(id)
-        +List~T~ listarTodos()
-    }
-    class RepositorioAluno
-    class RepositorioDisciplina
-    class RepositorioTurma
-}
-Repositorio <|.. RepositorioAluno
-Repositorio <|.. RepositorioDisciplina
-Repositorio <|.. RepositorioTurma
-
 namespace controller {
     class ServicoMatricula {
         -RepositorioDisciplina disciplinasRepo
@@ -136,23 +121,13 @@ namespace controller {
         +RelatorioSimulacao gerarRelatorio(Aluno)
     }
 }
-ServicoMatricula --> RepositorioAluno
-ServicoMatricula --> RepositorioDisciplina
-ServicoMatricula --> RepositorioTurma
 
 namespace view {
-    class RelatorioSimulacao {
-        -Aluno aluno
-        -Set~Turma~ turmasPlanejadas
-        -List~String~ mensagens
-        +String gerar()
-    }
     class LoggerSimulacao {
         +void info(String)
         +void warn(String)
         +void error(String)
     }
 }
-ServicoMatricula --> RelatorioSimulacao
 ServicoMatricula --> LoggerSimulacao
 ```
