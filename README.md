@@ -10,7 +10,7 @@ simulador-planejamento-academico/
  ├─ src/
  │  ├─ main/
  │  │   └─ java/
- │  │       └─ simulador/
+ │  │       └─ com.simulador/
  │  │            ├─ model/
  │  │            │    ├─ domain/
  │  │            │    │    ├─ Disciplina.java
@@ -19,23 +19,29 @@ simulador-planejamento-academico/
  │  │            │    │    ├─ DisciplinaOptativa.java
  │  │            │    │    ├─ Turma.java
  │  │            │    │    ├─ Aluno.java
- │  │            │    │    ├─ Horario.java
+ │  │            │    │    └─ Horario.java
  │  │            │    │  
- │  │            │    ├─ validator/
- │  │            │    │    ├─ ValidadorPreRequisito.java
- │  │            │    │    ├─ ValidadorSimples.java
- │  │            │    │    ├─ ValidadorLogicoAND.java
- │  │            │    │    └─ ValidadorLogicoOR.java
- │  │            │    │
- │  │            │    └─ separar em blocos menores controle ServicoMatricula
- │  │            │   
+ │  │            │    └─ validator/
+ │  │            │         ├─ ValidadorPreRequisito.java
+ │  │            │         ├─ ValidadorSimples.java
+ │  │            │         ├─ ValidadorLogicoAND.java
+ │  │            │         └─ ValidadorLogicoOR.java
+ │  │            │    
  │  │            ├─ repository/
- │  │            │    ├─ Repositorio.java
- │  │            │    ├─ RepositorioAluno.java
- │  │            │    ├─ RepositorioDisciplina.java
- │  │            │    └─ RepositorioTurma.java
+ │  │            │    ├─ ISubject.java
+ │  │            │    ├─ IStudent.java
+ │  │            │    ├─ IClass.java
+ │  │            │    │
+ │  │            │    └─ jsonFile/
+ │  │            │         ├─ File.java
+ │  │            │         ├─ Subject.java
+ │  │            │         ├─ Student.java
+ │  │            │         ├─ Class.java
  │  │            │
- │  │            ├─ controller/
+ │  │            ├─ services/   # Usar para dividir a função principal em blocos menores
+ │  │            │    ├─ VerifyDependencies.java
+ │  │            │
+ │  │            ├─ controller/ # Entrada do programa
  │  │            │    └─ ServicoMatricula.java
  │  │            │
  │  │            ├─ view/
