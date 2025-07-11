@@ -25,6 +25,7 @@ simulador-planejamento-academico/
  │  │            │         ├─ ValidadorPreRequisito.java
  │  │            │         ├─ ValidadorSimples.java
  │  │            │         ├─ ValidadorLogicoAND.java
+ │  │            │         ├─ ValidadorCreditosMinimos.java
  │  │            │         └─ ValidadorLogicoOR.java
  │  │            │
  │  │            ├─ services/   # Usar para dividir a função principal em blocos menores
