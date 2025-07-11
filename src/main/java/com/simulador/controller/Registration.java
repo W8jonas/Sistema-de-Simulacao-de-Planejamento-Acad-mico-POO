@@ -14,8 +14,8 @@ import java.util.List;
 public final class Registration {
 
     public void run() {
-        Schedule monday = new Schedule(1, 8 * 60, 9 * 60 + 40);     // Segunda 08:00–09:40
-        Schedule wednesday = new Schedule(3, 8 * 60, 9 * 60 + 40);  // Quarta 08:00–09:40
+        Schedule monday = new Schedule(1, 10, 12);
+        Schedule wednesday = new Schedule(3, 10, 12);
 
         Subject calculus = new RequiredSubject("MAT101", "Cálculo I", 4);
         ClassGroup groupA = new ClassGroup("MAT101-A", calculus, 40, List.of(monday, wednesday));
