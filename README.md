@@ -32,19 +32,18 @@ simulador-planejamento-academico/
  │  │            │
  │  │            └─ controller/ # Entrada do programa
  │  │                 └─ ServicoMatricula.java
- │  │            
- │  ├─ resources/
- │  │    ├─ Subjects.java
- │  │    ├─ Classes.java
- │  │    └─ Students.java
  │  │    
  │  └─ test/
- │       ├─ java/
- │       │    └─ simulador/
- │       │         ├─ validator/…
- │       │         ├─ service/…
- │       │         └─ domain/…
- │       └- 
+ │       └─ java/
+ │            └─ simulador/
+ │                 ├─ resources/
+ │                 │    ├─ Subjects.java
+ │                 │    ├─ ClassGroup.java
+ │                 │    └─ Students.java
+ │                 ├─ validator/…
+ │                 ├─ service/…
+ │                 └─ domain/…
+ │        
  └─ README.md
 ```
 
