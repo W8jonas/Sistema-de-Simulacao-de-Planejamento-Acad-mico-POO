@@ -13,6 +13,10 @@ import java.util.List;
 
 public final class Registration {
 
+    public static void main(String[] args) {
+        System.out.println("Hello teste!");
+    }
+
     public void run() {
         Schedule monday = new Schedule(1, 10, 12);
         Schedule wednesday = new Schedule(3, 10, 12);
