@@ -2,6 +2,7 @@ package com.simulador.controller;
 
 import com.simulador.model.domain.*;
 import com.simulador.model.validator.ValidadorPreRequisito;
+import com.simulador.model.exceptions.CargaHorariaExcedidaException;
 import com.simulador.services.VerifyDependencies;
 
 import java.util.*;
@@ -99,10 +100,16 @@ public class ServicoMatricula {
         // Se não há erros, adicionar ao planejamento
         if (relatorio.getErros().isEmpty()) {
             for (ClassGroup turma : turmasDesejadas) {
-                aluno.addToFuturePlanning(turma.getSubject());
-                relatorio.adicionarTurmaPlanejada(turma);
+                try {
+                    aluno.addToFuturePlanning(turma.getSubject());
+                    relatorio.adicionarTurmaPlanejada(turma);
+                } catch (CargaHorariaExcedidaException e) {
+                    relatorio.adicionarErro("Carga horária excedida: " + e.getMessage());
+                }
             }
-            relatorio.setSucesso(true);
+            if (relatorio.getErros().isEmpty()) {
+                relatorio.setSucesso(true);
+            }
         }
         
         return relatorio;
