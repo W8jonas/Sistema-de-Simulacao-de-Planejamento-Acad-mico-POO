@@ -67,9 +67,12 @@ public class ClassGroup {
 
     /**
      * Matricula um aluno na turma
-     * @throws TurmaCheiaException se a turma estiver cheia
+     * @throws TurmaCheiaException se a turma estiver cheia ou aluno já matriculado
      */
     public void enrollStudent(Student student) throws TurmaCheiaException {
+        if (isStudentEnrolled(student)) {
+            throw new TurmaCheiaException("Aluno já está matriculado na turma " + id);
+        }
         if (!hasAvailableSlots()) {
             throw new TurmaCheiaException("Turma " + id + " está cheia. Capacidade: " + capacity);
         }
