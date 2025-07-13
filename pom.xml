@@ -8,7 +8,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <exec.mainClass>com.simulador.controller.Registration</exec.mainClass>
+        <exec.mainClass>com.simulador.Main</exec.mainClass>
     </properties>
     <dependencies>
         <dependency>
@@ -34,7 +34,7 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-                                <mainClass>com.simulador.controller.Registration</mainClass>
+                                <mainClass>com.simulador.Main</mainClass>
                             </manifest>
                         </archive>
                     </configuration>
