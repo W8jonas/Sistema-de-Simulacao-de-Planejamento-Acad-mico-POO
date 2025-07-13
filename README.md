@@ -47,6 +47,56 @@ simulador-planejamento-academico/
  │        
  └─ README.md
 ```
+## Como Executar o Sistema
+
+### Pré-requisitos
+- Java 21 ou superior
+- Maven 3.6 ou superior
+
+### Compilação
+```bash
+mvn compile
+```
+
+### Execução
+```bash
+java -cp target/classes com.simulador.Main
+```
+
+### Uso da Interface
+
+Após executar, o sistema mostrará um menu interativo com 7 opções:
+
+1. **Ver relatório do aluno** - Relatório completo do aluno João Silva
+2. **Listar disciplinas disponíveis** - Todas as disciplinas do sistema
+3. **Listar turmas disponíveis** - Turmas com horários e capacidades
+4. **Verificar elegibilidade** - Testa se aluno pode cursar disciplina
+5. **Tentar matrícula** - Processa matrícula em turmas
+6. **Ver histórico** - Disciplinas cursadas e planejamento
+7. **Executar testes automáticos** - Roda cenários de teste
+0. **Sair** - Sai do sistema
+
+### Exemplo de Uso
+
+```bash
+# Compilar
+mvn compile
+
+# Executar
+java -cp target/classes com.simulador.Main
+
+# No menu, escolher opção 5 para tentar matrícula
+# Digitar: MAT156-01,DCC025-01
+# Ver relatório de sucesso com turmas planejadas
+```
+
+### Aluno de Teste
+- **Nome**: João Silva
+- **Matrícula**: 202365082A
+- **Histórico**: Cálculo I (8.5), Geometria Analítica (7.0), Algoritmos (9.0)
+
+
+
 
 Diagrama de classes do projeto:
 [Diagrama online no mermaid](https://www.mermaidchart.com/app/projects/a4e50a87-5301-4d4a-b4f5-64624b5565c8/diagrams/9d2acef6-a724-4817-81fc-8f849d2f6147/version/v0.1/edit)
