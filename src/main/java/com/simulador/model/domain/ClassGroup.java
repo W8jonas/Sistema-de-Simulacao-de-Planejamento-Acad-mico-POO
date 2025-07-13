@@ -31,7 +31,7 @@ public class ClassGroup {
     }
 
     public List<Schedule> getSchedules() {
-        return schedules;
+        return new ArrayList<>(schedules);
     }
 
     public boolean conflictsWith(ClassGroup other) {
