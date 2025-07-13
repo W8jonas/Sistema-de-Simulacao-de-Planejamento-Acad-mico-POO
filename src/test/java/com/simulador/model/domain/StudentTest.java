@@ -1,5 +1,6 @@
 package com.simulador.model.domain;
 
+import com.simulador.model.exceptions.CargaHorariaExcedidaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +45,7 @@ public class StudentTest {
     
     @Test
     @DisplayName("Adicionar disciplina ao planejamento futuro")
-    void testAdicionarAoPlanejamentoFuturo() {
+    void testAdicionarAoPlanejamentoFuturo() throws CargaHorariaExcedidaException {
         aluno.addToFuturePlanning(disciplina1);
         
         assertTrue(aluno.getFuturePlanning().contains(disciplina1));
@@ -54,7 +55,7 @@ public class StudentTest {
     
     @Test
     @DisplayName("Remover disciplina do planejamento futuro")
-    void testRemoverDoPlanejamentoFuturo() {
+    void testRemoverDoPlanejamentoFuturo() throws CargaHorariaExcedidaException {
         aluno.addToFuturePlanning(disciplina1);
         aluno.addToFuturePlanning(disciplina2);
         
@@ -69,26 +70,30 @@ public class StudentTest {
     
     @Test
     @DisplayName("Verificar limite de carga horária")
-    void testLimiteCargaHoraria() {
+    void testLimiteCargaHoraria() throws CargaHorariaExcedidaException {
         // Adicionar disciplinas até o limite
         aluno.addToFuturePlanning(disciplina1); // 4h
         aluno.addToFuturePlanning(disciplina2); // 4h
         
         assertTrue(aluno.isFuturePlanningWithinLimit()); // 8h <= 20h
         
-        // Adicionar mais disciplinas para exceder o limite
+        // Adicionar mais disciplinas até o limite
         Subject disciplina3 = new RequiredSubject("FIS073", "Física I", 4);
         Subject disciplina4 = new RequiredSubject("DCC119", "Algoritmos", 4);
         Subject disciplina5 = new RequiredSubject("DCC120", "Lab Programação", 4);
-        Subject disciplina6 = new RequiredSubject("DCC025", "Orientação a Objetos", 4);
         
         aluno.addToFuturePlanning(disciplina3); // 12h
         aluno.addToFuturePlanning(disciplina4); // 16h
         aluno.addToFuturePlanning(disciplina5); // 20h
-        aluno.addToFuturePlanning(disciplina6); // 24h
         
-        assertFalse(aluno.isFuturePlanningWithinLimit()); // 24h > 20h
-        assertEquals(-4, aluno.getRemainingWeeklyHours());
+        assertTrue(aluno.isFuturePlanningWithinLimit()); // 20h = 20h
+        assertEquals(0, aluno.getRemainingWeeklyHours());
+        
+        // Tentar adicionar mais uma disciplina deve lançar exceção
+        Subject disciplina6 = new RequiredSubject("DCC025", "Orientação a Objetos", 4);
+        assertThrows(CargaHorariaExcedidaException.class, () -> {
+            aluno.addToFuturePlanning(disciplina6); // 24h > 20h
+        }, "Deve lançar exceção quando carga horária é excedida");
     }
     
     @Test

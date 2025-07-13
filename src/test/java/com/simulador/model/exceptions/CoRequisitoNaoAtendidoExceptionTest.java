@@ -3,6 +3,7 @@ package com.simulador.model.exceptions;
 import com.simulador.model.domain.Student;
 import com.simulador.model.domain.RequiredSubject;
 import com.simulador.model.domain.Subject;
+import com.simulador.model.exceptions.CargaHorariaExcedidaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -88,7 +89,7 @@ public class CoRequisitoNaoAtendidoExceptionTest {
     
     @Test
     @DisplayName("Deve lançar exceção quando co-requisito é removido do planejamento")
-    void testExcecaoCoRequisitoRemovido() {
+    void testExcecaoCoRequisitoRemovido() throws CargaHorariaExcedidaException {
         // ARRANGE: Define co-requisito, adiciona e depois remove
         aluno.setCoRequisito(disciplinaPrincipal, coRequisito);
         aluno.addToFuturePlanning(coRequisito);
@@ -96,7 +97,11 @@ public class CoRequisitoNaoAtendidoExceptionTest {
         
         // ACT & ASSERT: Deve lançar exceção
         assertThrows(CoRequisitoNaoAtendidoException.class, () -> {
-            aluno.addToFuturePlanningWithCoRequisito(disciplinaPrincipal);
+            try {
+                aluno.addToFuturePlanningWithCoRequisito(disciplinaPrincipal);
+            } catch (CargaHorariaExcedidaException e) {
+                // Ignora exceção de carga horária para este teste
+            }
         }, "Deve lançar exceção quando co-requisito é removido do planejamento");
     }
     

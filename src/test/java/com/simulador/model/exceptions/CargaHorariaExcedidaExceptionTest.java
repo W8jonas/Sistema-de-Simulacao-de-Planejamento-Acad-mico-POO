@@ -138,14 +138,20 @@ public class CargaHorariaExcedidaExceptionTest {
     @DisplayName("Deve lançar exceção com múltiplas disciplinas pequenas")
     void testExcecaoMultiplasDisciplinasPequenas() throws CargaHorariaExcedidaException {
         // ARRANGE: Adiciona disciplinas pequenas até exceder
-        aluno.addToFuturePlanning(disciplina4); // 2h
-        aluno.addToFuturePlanning(disciplina4); // 2h
-        aluno.addToFuturePlanning(disciplina4); // 2h
-        aluno.addToFuturePlanning(disciplina4); // 2h (total: 8h)
+        Subject disciplinaPequena1 = new OptionalSubject("ART100", "Arte", 2);
+        Subject disciplinaPequena2 = new OptionalSubject("MUS100", "Música", 2);
+        Subject disciplinaPequena3 = new OptionalSubject("DAN100", "Dança", 2);
+        Subject disciplinaPequena4 = new OptionalSubject("TEAT100", "Teatro", 2);
+        
+        aluno.addToFuturePlanning(disciplinaPequena1); // 2h
+        aluno.addToFuturePlanning(disciplinaPequena2); // 2h
+        aluno.addToFuturePlanning(disciplinaPequena3); // 2h
+        aluno.addToFuturePlanning(disciplinaPequena4); // 2h (total: 8h)
         
         // ACT & ASSERT: Deve lançar exceção ao tentar adicionar mais uma
         assertThrows(CargaHorariaExcedidaException.class, () -> {
-            aluno.addToFuturePlanning(disciplina4); // +2h (total: 10h)
+            Subject disciplinaPequena5 = new OptionalSubject("CIN100", "Cinema", 2);
+            aluno.addToFuturePlanning(disciplinaPequena5); // +2h (total: 10h)
         }, "Deve lançar exceção com múltiplas disciplinas pequenas");
     }
 } 
