@@ -3,7 +3,7 @@ package com.simulador.model.exceptions;
 /**
  * Exceção lançada quando um pré-requisito não é atendido
  */
-public class PreRequisitoNaoCumpridoException extends Exception {
+public class PreRequisitoNaoCumpridoException extends ValidacaoMatriculaException {
     
     public PreRequisitoNaoCumpridoException(String message) {
         super(message);

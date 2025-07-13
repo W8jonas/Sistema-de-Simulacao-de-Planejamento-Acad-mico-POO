@@ -3,7 +3,7 @@ package com.simulador.model.exceptions;
 /**
  * Exceção lançada quando uma turma está cheia
  */
-public class TurmaCheiaException extends Exception {
+public class TurmaCheiaException extends GerenciamentoVagasException {
     
     public TurmaCheiaException(String message) {
         super(message);
