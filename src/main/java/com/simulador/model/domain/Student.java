@@ -1,5 +1,7 @@
 package com.simulador.model.domain;
 
+import com.simulador.model.exceptions.CargaHorariaExcedidaException;
+import com.simulador.model.exceptions.CoRequisitoNaoAtendidoException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +14,7 @@ public class Student {
     private Map<Subject, Double> completedSubjects; // disciplinas cursadas com notas
     private int maxWeeklyHours;
     private Set<Subject> futurePlanning; // planejamento futuro
+    private Map<Subject, Subject> coRequisitos; // mapeamento de co-requisitos
 
     public Student(String name, String registration, int maxWeeklyHours) {
         this.name = name;
@@ -19,6 +22,7 @@ public class Student {
         this.maxWeeklyHours = maxWeeklyHours;
         this.completedSubjects = new HashMap<>();
         this.futurePlanning = new HashSet<>();
+        this.coRequisitos = new HashMap<>();
     }
 
     // Getters básicos
@@ -58,13 +62,55 @@ public class Student {
     }
 
     // Adiciona uma disciplina ao planejamento futuro
-    public void addToFuturePlanning(Subject subject) {
+    public void addToFuturePlanning(Subject subject) throws CargaHorariaExcedidaException {
+        int novaCargaHoraria = getFuturePlanningWeeklyHours() + subject.getWeeklyHours();
+        if (novaCargaHoraria > maxWeeklyHours) {
+            throw new CargaHorariaExcedidaException(
+                "Carga horária excedida: " + novaCargaHoraria + "h > " + maxWeeklyHours + "h"
+            );
+        }
         futurePlanning.add(subject);
     }
 
     // Remove uma disciplina do planejamento futuro
     public void removeFromFuturePlanning(Subject subject) {
         futurePlanning.remove(subject);
+    }
+
+    /**
+     * Define um co-requisito para uma disciplina
+     */
+    public void setCoRequisito(Subject disciplina, Subject coRequisito) {
+        coRequisitos.put(disciplina, coRequisito);
+    }
+
+    /**
+     * Verifica se um co-requisito é atendido
+     */
+    public boolean isCoRequisitoAtendido(Subject disciplina) {
+        Subject coRequisito = coRequisitos.get(disciplina);
+        if (coRequisito == null) {
+            return true; // Não há co-requisito
+        }
+        return futurePlanning.contains(coRequisito) || completedSubjects.containsKey(coRequisito);
+    }
+
+    /**
+     * Adiciona uma disciplina ao planejamento verificando co-requisitos
+     */
+    public void addToFuturePlanningWithCoRequisito(Subject disciplina) 
+            throws CargaHorariaExcedidaException, CoRequisitoNaoAtendidoException {
+        
+        // Verificar co-requisito
+        if (!isCoRequisitoAtendido(disciplina)) {
+            Subject coRequisito = coRequisitos.get(disciplina);
+            throw new CoRequisitoNaoAtendidoException(
+                "Co-requisito não atendido: " + disciplina.getCode() + 
+                " requer " + coRequisito.getCode() + " no mesmo período"
+            );
+        }
+        
+        addToFuturePlanning(disciplina);
     }
 
     // Calcula o total de horas semanais do planejamento futuro
