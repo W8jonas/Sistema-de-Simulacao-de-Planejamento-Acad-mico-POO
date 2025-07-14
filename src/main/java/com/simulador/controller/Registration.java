@@ -34,7 +34,8 @@ public class Registration {
         RequiredSubject labIntroFisica = new RequiredSubject("FIS122", "Laboratório de Introdução às Ciências Físicas", 2);
         RequiredSubject labFisicaI = new RequiredSubject("FIS077", "Laboratório de Física I", 2);
         RequiredSubject quimicaFundamental = new RequiredSubject("QUI125", "Química Fundamental", 4);
-        RequiredSubject laboratorioQuimica = new RequiredSubject("QUI126", "Laboratório de Química", 2);
+        RequiredSubject quimicaGeral = new RequiredSubject("QUI126", "Química Geral", 4); // Nova disciplina similar
+        RequiredSubject laboratorioQuimica = new RequiredSubject("QUI127", "Laboratório de Química", 2);
         RequiredSubject introducaoExatas = new RequiredSubject("ICE001", "Introdução às Ciências Exatas", 2);
         RequiredSubject algoritmos = new RequiredSubject("DCC119", "Algoritmos", 4);
         RequiredSubject labProgramacao = new RequiredSubject("DCC120", "Laboratório de Programação", 4);
@@ -69,8 +70,12 @@ public class Registration {
         );
         fisicaII.setValidadores(new ValidadorLogicoAND(preRequisitosFisicaII));
         
-        // Laboratório de Química: requer QUI125 (ValidadorSimples)
-        laboratorioQuimica.setValidadores(new ValidadorSimples(quimicaFundamental));
+        // Laboratório de Química: requer QUI125 OU QUI126 (ValidadorLogicoOR)
+        List<ValidadorPreRequisito> preRequisitosLabQuimica = Arrays.asList(
+            new ValidadorSimples(quimicaFundamental),
+            new ValidadorSimples(quimicaGeral)
+        );
+        laboratorioQuimica.setValidadores(new ValidadorLogicoOR(preRequisitosLabQuimica));
         
         // Laboratório de Física I: requer FIS122 (ValidadorSimples)
         labFisicaI.setValidadores(new ValidadorSimples(labIntroFisica));
@@ -119,6 +124,8 @@ public class Registration {
         );
         monografiaFinal.setValidadores(new ValidadorLogicoAND(validadoresMonografia));
         
+
+        
         // Registrar todas as disciplinas
         servicoMatricula.registrarDisciplina(calculoI);
         servicoMatricula.registrarDisciplina(geometriaAnalitica);
@@ -128,6 +135,7 @@ public class Registration {
         servicoMatricula.registrarDisciplina(labIntroFisica);
         servicoMatricula.registrarDisciplina(labFisicaI);
         servicoMatricula.registrarDisciplina(quimicaFundamental);
+        servicoMatricula.registrarDisciplina(quimicaGeral);
         servicoMatricula.registrarDisciplina(laboratorioQuimica);
         servicoMatricula.registrarDisciplina(introducaoExatas);
         servicoMatricula.registrarDisciplina(algoritmos);
@@ -178,6 +186,8 @@ public class Registration {
         ClassGroup turmaCalculoI_2 = new ClassGroup("MAT154-02", calculoI, 30, Arrays.asList(seg10h)); // Conflito com MAT154-01
         ClassGroup turmaGeometria_1 = new ClassGroup("MAT155-01", geometriaAnalitica, 25, Arrays.asList(ter8h));
         ClassGroup turmaQuimicaFund_1 = new ClassGroup("QUI125-01", quimicaFundamental, 25, Arrays.asList(qua8h));
+        ClassGroup turmaQuimicaGeral_1 = new ClassGroup("QUI126-01", quimicaGeral, 25, Arrays.asList(qui8h));
+        ClassGroup turmaLabQuimica_1 = new ClassGroup("QUI127-01", laboratorioQuimica, 15, Arrays.asList(qui14h));
         ClassGroup turmaAlgoritmos_1 = new ClassGroup("DCC119-01", algoritmos, 20, Arrays.asList(qui8h));
         ClassGroup turmaLabProg_1 = new ClassGroup("DCC120-01", labProgramacao, 15, Arrays.asList(sex8h));
         ClassGroup turmaOrientacaoObj_1 = new ClassGroup("DCC025-01", orientacaoObjetos, 20, Arrays.asList(seg14h));
@@ -185,7 +195,7 @@ public class Registration {
         // Disciplinas com pré-requisitos simples
         ClassGroup turmaCalculoII_1 = new ClassGroup("MAT156-01", calculoII, 25, Arrays.asList(ter14h));
         ClassGroup turmaFisicaI_1 = new ClassGroup("FIS073-01", fisicaI, 25, Arrays.asList(qua14h));
-        ClassGroup turmaLabQuimica_1 = new ClassGroup("QUI126-01", laboratorioQuimica, 15, Arrays.asList(qui14h));
+
         ClassGroup turmaLabIntroFisica_1 = new ClassGroup("FIS122-01", labIntroFisica, 20, Arrays.asList(sex8h));
         ClassGroup turmaLabFisicaI_1 = new ClassGroup("FIS077-01", labFisicaI, 15, Arrays.asList(sex10h));
         ClassGroup turmaEstruturaDados_1 = new ClassGroup("DCC013-01", estruturaDados, 20, Arrays.asList(sex14h));
@@ -198,6 +208,7 @@ public class Registration {
         ClassGroup turmaTeoriaGrafos_1 = new ClassGroup("DCC059-01", teoriaGrafos, 15, Arrays.asList(sex16h));
         ClassGroup turmaMetodologia_1 = new ClassGroup("DCC123-01", metodologiaCientifica, 10, Arrays.asList(seg8h)); // Conflito com MAT154-01
         ClassGroup turmaMonografia_1 = new ClassGroup("DCC110-01", monografiaFinal, 5, Arrays.asList(ter8h)); // Conflito com MAT155-01
+
         
         // Turmas extras para testar conflitos
         ClassGroup turmaCalculoI_3 = new ClassGroup("MAT154-03", calculoI, 30, Arrays.asList(seg8h)); // Conflito com MAT154-01
@@ -212,6 +223,8 @@ public class Registration {
         servicoMatricula.registrarTurma(turmaGeometria_2);
         servicoMatricula.registrarTurma(turmaQuimicaFund_1);
         servicoMatricula.registrarTurma(turmaQuimicaFund_2);
+        servicoMatricula.registrarTurma(turmaQuimicaGeral_1);
+        servicoMatricula.registrarTurma(turmaLabQuimica_1);
         servicoMatricula.registrarTurma(turmaCalculoII_1);
         servicoMatricula.registrarTurma(turmaFisicaI_1);
         servicoMatricula.registrarTurma(turmaFisicaII_1);
@@ -238,16 +251,7 @@ public class Registration {
         aluno.addCompletedSubject(algoritmos, 9.0);
         aluno.addCompletedSubject(introducaoExatas, 8.0); // ICE001 já cursada
         aluno.addCompletedSubject(labIntroFisica, 8.0); // FIS122 já cursada
-        
-        // Adicionar mais disciplinas para atingir 34 créditos
-        aluno.addCompletedSubject(calculoII, 7.5);
-        aluno.addCompletedSubject(fisicaI, 8.0);
-        aluno.addCompletedSubject(labProgramacao, 9.0);
-        aluno.addCompletedSubject(estruturaDados, 8.5);
-        aluno.addCompletedSubject(orientacaoObjetos, 8.0);
         aluno.addCompletedSubject(quimicaFundamental, 7.5);
-        aluno.addCompletedSubject(laboratorioQuimica, 8.0);
-        aluno.addCompletedSubject(labFisicaI, 8.5);
         
         // Registrar aluno
         servicoMatricula.registrarAluno(aluno);

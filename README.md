@@ -47,6 +47,7 @@ simulador-planejamento-academico/
  │        
  └─ README.md
 ```
+
 ## Como Executar o Sistema
 
 ### Pré-requisitos
@@ -63,7 +64,7 @@ mvn compile
 java -cp target/classes com.simulador.Main
 ```
 
-### Uso da Interface
+## Menu de Opções
 
 Após executar, o sistema mostrará um menu interativo com 7 opções:
 
@@ -85,18 +86,14 @@ mvn compile
 # Executar
 java -cp target/classes com.simulador.Main
 
-# No menu, escolher opção 5 para tentar matrícula
+# No menu, escolher opção 4 para verificar elegibilidade
+# Digitar: DCC123
+# Ver relatório de elegibilidade para Metodologia Científica
+
+# Escolher opção 5 para tentar matrícula
 # Digitar: MAT156-01,DCC025-01
 # Ver relatório de sucesso com turmas planejadas
 ```
-
-### Aluno de Teste
-- **Nome**: João Silva
-- **Matrícula**: 202365082A
-- **Histórico**: Cálculo I (8.5), Geometria Analítica (7.0), Algoritmos (9.0)
-
-
-
 
 Diagrama de classes do projeto:
 [Diagrama online no mermaid](https://www.mermaidchart.com/app/projects/a4e50a87-5301-4d4a-b4f5-64624b5565c8/diagrams/9d2acef6-a724-4817-81fc-8f849d2f6147/version/v0.1/edit)
