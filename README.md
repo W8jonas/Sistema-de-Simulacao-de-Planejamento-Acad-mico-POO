@@ -77,7 +77,46 @@ Após executar, o sistema mostrará um menu interativo com 7 opções:
 7. **Executar testes automáticos** - Roda cenários de teste
 0. **Sair** - Sai do sistema
 
-### Exemplo de Uso
+## 🎯 Casos Específicos Importantes
+
+### ✅ Sistema de Pré-requisitos
+- **ValidadorSimples**: Pré-requisito único (nota >= 6.0)
+- **ValidadorLogicoAND**: Múltiplos pré-requisitos (todos obrigatórios)
+- **ValidadorLogicoOR**: Múltiplos pré-requisitos (pelo menos um)
+- **ValidadorCreditosMinimos**: Exige créditos mínimos acumulados
+
+### ✅ Resolução de Conflitos
+**Precedência**: Obrigatória > Eletiva > Optativa
+
+Quando há conflito de horário entre disciplinas, o sistema escolhe baseado na precedência:
+- **Obrigatória** sempre vence sobre Eletiva e Optativa
+- **Eletiva** sempre vence sobre Optativa
+- **Mesma precedência** = exceção (não resolve automaticamente)
+
+### ✅ Controle de Créditos
+- **1 hora semanal = 1 crédito** (4h = 4 créditos)
+- **Apenas disciplinas aprovadas** (nota >= 6.0) contam para créditos
+- **Disciplinas com créditos mínimos**:
+  - Metodologia Científica (DCC123): 34 créditos
+  - Monografia Final (DCC124): 34 créditos
+
+### ✅ Co-requisitos
+Disciplinas que devem ser cursadas **simultaneamente**:
+- Adicionadas ao planejamento futuro
+- Validadas automaticamente
+- Exceção se não atendidos
+
+## 📝 Disciplinas Específicas
+
+### Eletiva (DCC197)
+- **VISÃO COMPUTACIONAL**
+- 4 horas semanais = 4 créditos
+
+### Optativa (D133)
+- **introducao a sistemas de informação**
+- 2 horas semanais = 2 créditos
+
+## 🧪 Testes
 
 ```bash
 # Compilar
@@ -86,13 +125,7 @@ mvn compile
 # Executar
 java -cp target/classes com.simulador.Main
 
-# No menu, escolher opção 4 para verificar elegibilidade
-# Digitar: DCC123
-# Ver relatório de elegibilidade para Metodologia Científica
 
-# Escolher opção 5 para tentar matrícula
-# Digitar: MAT156-01,DCC025-01
-# Ver relatório de sucesso com turmas planejadas
 ```
 
 Diagrama de classes do projeto:
