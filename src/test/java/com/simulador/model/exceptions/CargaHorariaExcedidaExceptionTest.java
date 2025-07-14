@@ -20,8 +20,8 @@ public class CargaHorariaExcedidaExceptionTest {
         aluno = new Student("João Silva", "202365082A", 8); // Limite de 8 horas
         disciplina1 = new RequiredSubject("MAT154", "Cálculo I", 4);
         disciplina2 = new RequiredSubject("MAT155", "Geometria Analítica", 4);
-        disciplina3 = new ElectiveSubject("DCC119", "Algoritmos", 4);
-        disciplina4 = new OptionalSubject("DCC100", "Seminários", 2);
+        disciplina3 = new ElectiveSubject("DCC197", "VISÃO COMPUTACIONAL", 4);
+        disciplina4 = new OptionalSubject("D133", "introducao a sistemas de informação", 2);
     }
     
     @Test
@@ -138,8 +138,8 @@ public class CargaHorariaExcedidaExceptionTest {
     @DisplayName("Deve lançar exceção com múltiplas disciplinas pequenas")
     void testExcecaoMultiplasDisciplinasPequenas() throws CargaHorariaExcedidaException {
         // ARRANGE: Adiciona disciplinas pequenas até exceder
-        Subject disciplinaPequena1 = new OptionalSubject("DCC100", "Seminários", 2);
-        Subject disciplinaPequena2 = new OptionalSubject("DCC100", "Seminários", 2);
+        Subject disciplinaPequena1 = new OptionalSubject("D133", "introducao a sistemas de informação", 2);
+        Subject disciplinaPequena2 = new OptionalSubject("D133", "introducao a sistemas de informação", 2);
         Subject disciplinaPequena3 = new OptionalSubject("DCC101", "Introdução à Programação", 2);
         Subject disciplinaPequena4 = new OptionalSubject("DCC102", "Metodologia", 2);
         

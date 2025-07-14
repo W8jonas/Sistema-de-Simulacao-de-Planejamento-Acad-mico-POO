@@ -79,7 +79,7 @@ public class StudentTest {
         
         // Adicionar mais disciplinas até o limite
         Subject disciplina3 = new RequiredSubject("FIS073", "Física I", 4);
-        Subject disciplina4 = new RequiredSubject("DCC119", "Algoritmos", 4);
+        Subject disciplina4 = new RequiredSubject("DCC197", "VISÃO COMPUTACIONAL", 4);
         Subject disciplina5 = new RequiredSubject("DCC120", "Lab Programação", 4);
         
         aluno.addToFuturePlanning(disciplina3); // 12h

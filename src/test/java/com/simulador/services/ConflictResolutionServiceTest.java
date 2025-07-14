@@ -1,6 +1,7 @@
 package com.simulador.services;
 
 import com.simulador.model.domain.*;
+import com.simulador.model.exceptions.ConflitoDeHorarioException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -14,199 +15,143 @@ import java.util.*;
 public class ConflictResolutionServiceTest {
     
     private ConflictResolutionService service;
-    private Subject disciplinaObrigatoria, disciplinaEletiva, disciplinaOptativa;
-    private Subject disciplinaObrigatoria2, disciplinaEletiva2, disciplinaOptativa2;
+    private ClassGroup turmaObrigatoria, turmaEletiva, turmaOptativa;
+    private ClassGroup turmaObrigatoria2, turmaEletiva2, turmaOptativa2;
     
     @BeforeEach
     void setUp() {
         service = new ConflictResolutionService();
-        disciplinaObrigatoria = new RequiredSubject("MAT154", "Cálculo I", 4);
-        disciplinaEletiva = new ElectiveSubject("DCC119", "Algoritmos", 4);
-        disciplinaOptativa = new OptionalSubject("DCC100", "Seminários", 2);
-        disciplinaObrigatoria2 = new RequiredSubject("MAT155", "Geometria Analítica", 4);
-        disciplinaEletiva2 = new ElectiveSubject("DCC120", "Laboratório de Programação", 4);
-        disciplinaOptativa2 = new OptionalSubject("DCC101", "Introdução à Programação", 2);
+        
+        // Criar disciplinas
+        Subject disciplinaObrigatoria = new RequiredSubject("MAT154", "Cálculo I", 4);
+        Subject disciplinaEletiva = new ElectiveSubject("DCC197", "VISÃO COMPUTACIONAL", 4);
+        Subject disciplinaOptativa = new OptionalSubject("D133", "introducao a sistemas de informação", 2);
+        Subject disciplinaObrigatoria2 = new RequiredSubject("MAT155", "Geometria Analítica", 4);
+        Subject disciplinaEletiva2 = new ElectiveSubject("DCC120", "Laboratório de Programação", 4);
+        Subject disciplinaOptativa2 = new OptionalSubject("DCC101", "Introdução à Programação", 2);
+        
+        // Criar turmas com horários conflitantes
+        Schedule horario = new Schedule(1, 8, 10); // Segunda-feira, 8h às 10h
+        turmaObrigatoria = new ClassGroup("MAT154-01", disciplinaObrigatoria, 30, Arrays.asList(horario));
+        turmaEletiva = new ClassGroup("DCC197-01", disciplinaEletiva, 25, Arrays.asList(horario));
+        turmaOptativa = new ClassGroup("D133-01", disciplinaOptativa, 20, Arrays.asList(horario));
+        turmaObrigatoria2 = new ClassGroup("MAT155-01", disciplinaObrigatoria2, 30, Arrays.asList(horario));
+        turmaEletiva2 = new ClassGroup("DCC120-01", disciplinaEletiva2, 25, Arrays.asList(horario));
+        turmaOptativa2 = new ClassGroup("DCC101-01", disciplinaOptativa2, 20, Arrays.asList(horario));
     }
     
     @Test
     @DisplayName("Deve resolver conflito com obrigatória prevalecendo sobre eletiva")
-    void testObrigatoriaPrevalecendoSobreEletiva() {
+    void testObrigatoriaPrevalecendoSobreEletiva() throws ConflitoDeHorarioException {
         // ARRANGE: Conflito entre obrigatória e eletiva
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaObrigatoria);
-        disciplinasConflitantes.add(disciplinaEletiva);
+        List<ClassGroup> turmasConflitantes = Arrays.asList(turmaObrigatoria, turmaEletiva);
         
         // ACT: Resolve conflito
-        List<Subject> resultado = service.resolveConflicts(disciplinasConflitantes);
+        List<ClassGroup> resultado = service.resolveConflicts(turmasConflitantes);
         
         // ASSERT: Obrigatória deve vir primeiro
-        assertEquals(2, resultado.size(), "Deve ter 2 disciplinas");
-        assertEquals(disciplinaObrigatoria, resultado.get(0), "Obrigatória deve vir primeiro");
-        assertEquals(disciplinaEletiva, resultado.get(1), "Eletiva deve vir segundo");
+        assertEquals(1, resultado.size(), "Deve ter 1 turma aceita");
+        assertEquals(turmaObrigatoria, resultado.get(0), "Obrigatória deve ser aceita");
     }
     
     @Test
     @DisplayName("Deve resolver conflito com eletiva prevalecendo sobre optativa")
-    void testEletivaPrevalecendoSobreOptativa() {
+    void testEletivaPrevalecendoSobreOptativa() throws ConflitoDeHorarioException {
         // ARRANGE: Conflito entre eletiva e optativa
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaEletiva);
-        disciplinasConflitantes.add(disciplinaOptativa);
+        List<ClassGroup> turmasConflitantes = Arrays.asList(turmaEletiva, turmaOptativa);
         
         // ACT: Resolve conflito
-        List<Subject> resultado = service.resolveConflicts(disciplinasConflitantes);
+        List<ClassGroup> resultado = service.resolveConflicts(turmasConflitantes);
         
-        // ASSERT: Eletiva deve vir primeiro
-        assertEquals(2, resultado.size(), "Deve ter 2 disciplinas");
-        assertEquals(disciplinaEletiva, resultado.get(0), "Eletiva deve vir primeiro");
-        assertEquals(disciplinaOptativa, resultado.get(1), "Optativa deve vir segundo");
+        // ASSERT: Eletiva deve ser aceita
+        assertEquals(1, resultado.size(), "Deve ter 1 turma aceita");
+        assertEquals(turmaEletiva, resultado.get(0), "Eletiva deve ser aceita");
     }
     
     @Test
     @DisplayName("Deve resolver conflito com obrigatória prevalecendo sobre optativa")
-    void testObrigatoriaPrevalecendoSobreOptativa() {
+    void testObrigatoriaPrevalecendoSobreOptativa() throws ConflitoDeHorarioException {
         // ARRANGE: Conflito entre obrigatória e optativa
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaObrigatoria);
-        disciplinasConflitantes.add(disciplinaOptativa);
+        List<ClassGroup> turmasConflitantes = Arrays.asList(turmaObrigatoria, turmaOptativa);
         
         // ACT: Resolve conflito
-        List<Subject> resultado = service.resolveConflicts(disciplinasConflitantes);
+        List<ClassGroup> resultado = service.resolveConflicts(turmasConflitantes);
         
-        // ASSERT: Obrigatória deve vir primeiro
-        assertEquals(2, resultado.size(), "Deve ter 2 disciplinas");
-        assertEquals(disciplinaObrigatoria, resultado.get(0), "Obrigatória deve vir primeiro");
-        assertEquals(disciplinaOptativa, resultado.get(1), "Optativa deve vir segundo");
+        // ASSERT: Obrigatória deve ser aceita
+        assertEquals(1, resultado.size(), "Deve ter 1 turma aceita");
+        assertEquals(turmaObrigatoria, resultado.get(0), "Obrigatória deve ser aceita");
     }
     
     @Test
     @DisplayName("Deve resolver conflito com múltiplas disciplinas")
-    void testConflitoMultiplasDisciplinas() {
+    void testConflitoMultiplasDisciplinas() throws ConflitoDeHorarioException {
         // ARRANGE: Conflito entre múltiplas disciplinas
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaObrigatoria);
-        disciplinasConflitantes.add(disciplinaEletiva);
-        disciplinasConflitantes.add(disciplinaOptativa);
+        List<ClassGroup> turmasConflitantes = Arrays.asList(turmaObrigatoria, turmaEletiva, turmaOptativa);
         
         // ACT: Resolve conflito
-        List<Subject> resultado = service.resolveConflicts(disciplinasConflitantes);
+        List<ClassGroup> resultado = service.resolveConflicts(turmasConflitantes);
         
-        // ASSERT: Deve estar ordenado por precedência
-        assertEquals(3, resultado.size(), "Deve ter 3 disciplinas");
-        assertEquals(disciplinaObrigatoria, resultado.get(0), "Obrigatória deve vir primeiro");
-        assertEquals(disciplinaEletiva, resultado.get(1), "Eletiva deve vir segundo");
-        assertEquals(disciplinaOptativa, resultado.get(2), "Optativa deve vir terceiro");
+        // ASSERT: Deve aceitar apenas a obrigatória
+        assertEquals(1, resultado.size(), "Deve ter 1 turma aceita");
+        assertEquals(turmaObrigatoria, resultado.get(0), "Obrigatória deve ser aceita");
     }
     
     @Test
-    @DisplayName("Deve detectar conflito entre disciplinas de mesma precedência")
+    @DisplayName("Deve lançar exceção para conflito entre disciplinas de mesma precedência")
     void testConflitoMesmaPrecedencia() {
         // ARRANGE: Conflito entre duas obrigatórias
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaObrigatoria);
-        disciplinasConflitantes.add(disciplinaObrigatoria2);
+        List<ClassGroup> turmasConflitantes = Arrays.asList(turmaObrigatoria, turmaObrigatoria2);
         
-        // ACT & ASSERT: Deve detectar conflito
-        assertTrue(service.hasSamePrecedenceConflict(disciplinasConflitantes), 
-                  "Deve detectar conflito entre disciplinas de mesma precedência");
+        // ACT & ASSERT: Deve lançar exceção
+        assertThrows(com.simulador.model.exceptions.ConflitoDeHorarioException.class, 
+                    () -> service.resolveConflicts(turmasConflitantes),
+                    "Deve lançar exceção para conflito entre disciplinas de mesma precedência");
     }
     
     @Test
-    @DisplayName("Não deve detectar conflito entre disciplinas de precedências diferentes")
-    void testNaoConflitoPrecedenciasDiferentes() {
-        // ARRANGE: Disciplinas de precedências diferentes
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaObrigatoria);
-        disciplinasConflitantes.add(disciplinaEletiva);
+    @DisplayName("Deve aceitar turmas sem conflito")
+    void testTurmasSemConflito() throws ConflitoDeHorarioException {
+        // ARRANGE: Turmas sem conflito (horários diferentes)
+        Schedule horario1 = new Schedule(1, 8, 10);   // Segunda 8-10h
+        Schedule horario2 = new Schedule(2, 8, 10);   // Terça 8-10h
         
-        // ACT & ASSERT: Não deve detectar conflito
-        assertFalse(service.hasSamePrecedenceConflict(disciplinasConflitantes), 
-                   "Não deve detectar conflito entre disciplinas de precedências diferentes");
-    }
-    
-    @Test
-    @DisplayName("Deve obter disciplina com maior precedência")
-    void testGetHighestPrecedenceSubject() {
-        // ARRANGE: Disciplinas com diferentes precedências
-        Set<Subject> disciplinas = new HashSet<>();
-        disciplinas.add(disciplinaEletiva);
-        disciplinas.add(disciplinaObrigatoria);
-        disciplinas.add(disciplinaOptativa);
+        Subject disciplina1 = new RequiredSubject("MAT154", "Cálculo I", 4);
+        Subject disciplina2 = new RequiredSubject("MAT155", "Geometria Analítica", 4);
         
-        // ACT: Obtém disciplina com maior precedência
-        Subject resultado = service.getHighestPrecedenceSubject(disciplinas);
+        ClassGroup turma1 = new ClassGroup("MAT154-01", disciplina1, 30, Arrays.asList(horario1));
+        ClassGroup turma2 = new ClassGroup("MAT155-01", disciplina2, 30, Arrays.asList(horario2));
         
-        // ASSERT: Deve ser a obrigatória
-        assertEquals(disciplinaObrigatoria, resultado, "Deve ser a disciplina obrigatória");
-    }
-    
-    @Test
-    @DisplayName("Deve retornar null para conjunto vazio")
-    void testGetHighestPrecedenceSubjectEmpty() {
-        // ARRANGE: Conjunto vazio
-        Set<Subject> disciplinas = new HashSet<>();
-        
-        // ACT: Obtém disciplina com maior precedência
-        Subject resultado = service.getHighestPrecedenceSubject(disciplinas);
-        
-        // ASSERT: Deve ser null
-        assertNull(resultado, "Deve retornar null para conjunto vazio");
-    }
-    
-    @Test
-    @DisplayName("Deve filtrar disciplinas por tipo")
-    void testFilterByType() {
-        // ARRANGE: Disciplinas de diferentes tipos
-        Set<Subject> disciplinas = new HashSet<>();
-        disciplinas.add(disciplinaObrigatoria);
-        disciplinas.add(disciplinaEletiva);
-        disciplinas.add(disciplinaOptativa);
-        
-        // ACT: Filtra por tipo
-        List<Subject> obrigatorias = service.filterByType(disciplinas, RequiredSubject.class);
-        List<Subject> eletivas = service.filterByType(disciplinas, ElectiveSubject.class);
-        List<Subject> optativas = service.filterByType(disciplinas, OptionalSubject.class);
-        
-        // ASSERT: Deve filtrar corretamente
-        assertEquals(1, obrigatorias.size(), "Deve ter 1 obrigatória");
-        assertEquals(1, eletivas.size(), "Deve ter 1 eletiva");
-        assertEquals(1, optativas.size(), "Deve ter 1 optativa");
-        assertEquals(disciplinaObrigatoria, obrigatorias.get(0), "Deve ser a disciplina obrigatória");
-        assertEquals(disciplinaEletiva, eletivas.get(0), "Deve ser a disciplina eletiva");
-        assertEquals(disciplinaOptativa, optativas.get(0), "Deve ser a disciplina optativa");
-    }
-    
-    @Test
-    @DisplayName("Deve resolver conflito com múltiplas eletivas")
-    void testConflitoMultiplasEletivas() {
-        // ARRANGE: Conflito entre duas eletivas
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaEletiva);
-        disciplinasConflitantes.add(disciplinaEletiva2);
+        List<ClassGroup> turmas = Arrays.asList(turma1, turma2);
         
         // ACT: Resolve conflito
-        List<Subject> resultado = service.resolveConflicts(disciplinasConflitantes);
+        List<ClassGroup> resultado = service.resolveConflicts(turmas);
         
-        // ASSERT: Deve ter 2 disciplinas (ordem não importa para mesma precedência)
-        assertEquals(2, resultado.size(), "Deve ter 2 disciplinas");
-        assertTrue(resultado.contains(disciplinaEletiva), "Deve conter primeira eletiva");
-        assertTrue(resultado.contains(disciplinaEletiva2), "Deve conter segunda eletiva");
+        // ASSERT: Deve aceitar ambas as turmas
+        assertEquals(2, resultado.size(), "Deve aceitar ambas as turmas");
+        assertTrue(resultado.contains(turma1), "Deve conter primeira turma");
+        assertTrue(resultado.contains(turma2), "Deve conter segunda turma");
     }
     
     @Test
-    @DisplayName("Deve resolver conflito com múltiplas optativas")
-    void testConflitoMultiplasOptativas() {
-        // ARRANGE: Conflito entre duas optativas
-        Set<Subject> disciplinasConflitantes = new HashSet<>();
-        disciplinasConflitantes.add(disciplinaOptativa);
-        disciplinasConflitantes.add(disciplinaOptativa2);
+    @DisplayName("Deve retornar lista vazia para lista vazia")
+    void testListaVazia() throws ConflitoDeHorarioException {
+        // ARRANGE: Lista vazia
+        List<ClassGroup> turmas = new ArrayList<>();
         
         // ACT: Resolve conflito
-        List<Subject> resultado = service.resolveConflicts(disciplinasConflitantes);
+        List<ClassGroup> resultado = service.resolveConflicts(turmas);
         
-        // ASSERT: Deve ter 2 disciplinas (ordem não importa para mesma precedência)
-        assertEquals(2, resultado.size(), "Deve ter 2 disciplinas");
-        assertTrue(resultado.contains(disciplinaOptativa), "Deve conter primeira optativa");
-        assertTrue(resultado.contains(disciplinaOptativa2), "Deve conter segunda optativa");
+        // ASSERT: Deve retornar lista vazia
+        assertTrue(resultado.isEmpty(), "Deve retornar lista vazia");
+    }
+    
+    @Test
+    @DisplayName("Deve retornar lista vazia para null")
+    void testListaNull() throws ConflitoDeHorarioException {
+        // ACT: Resolve conflito
+        List<ClassGroup> resultado = service.resolveConflicts(null);
+        
+        // ASSERT: Deve retornar lista vazia
+        assertTrue(resultado.isEmpty(), "Deve retornar lista vazia");
     }
 } 

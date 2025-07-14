@@ -1,83 +1,106 @@
 package com.simulador.services;
 
-import com.simulador.model.domain.*;
+import com.simulador.model.domain.ClassGroup;
+import com.simulador.model.domain.Subject;
+import com.simulador.model.exceptions.ConflitoDeHorarioException;
 import java.util.*;
 
 /**
- * Serviço para resolver conflitos de matrícula baseado na precedência das disciplinas
+ * Serviço responsável por resolver conflitos de horário entre disciplinas
+ * baseado na precedência: Obrigatória > Eletiva > Optativa
  */
 public class ConflictResolutionService {
     
     /**
-     * Resolve conflitos de horário baseado na precedência das disciplinas
-     * Obrigatória > Eletiva > Optativa
+     * Resolve conflitos de horário entre turmas baseado na precedência
+     * @param turmas Lista de turmas candidatas
+     * @return Lista de turmas aceitas após resolução de conflitos
+     * @throws ConflitoDeHorarioException se há conflito entre disciplinas de mesma precedência
      */
-    public List<Subject> resolveConflicts(Set<Subject> disciplinasConflitantes) {
-        List<Subject> disciplinasOrdenadas = new ArrayList<>(disciplinasConflitantes);
+    public List<ClassGroup> resolveConflicts(List<ClassGroup> turmas) throws ConflitoDeHorarioException {
+        if (turmas == null || turmas.isEmpty()) {
+            return new ArrayList<>();
+        }
         
-        // Ordenar por precedência: Obrigatória > Eletiva > Optativa
-        disciplinasOrdenadas.sort((d1, d2) -> {
-            int precedencia1 = getPrecedence(d1);
-            int precedencia2 = getPrecedence(d2);
-            return Integer.compare(precedencia2, precedencia1); // Ordem decrescente
-        });
+        // Agrupar turmas por horário
+        Map<String, List<ClassGroup>> turmasPorHorario = groupBySchedule(turmas);
         
-        return disciplinasOrdenadas;
+        List<ClassGroup> turmasAceitas = new ArrayList<>();
+        
+        // Para cada horário, resolver conflitos
+        for (List<ClassGroup> turmasNoHorario : turmasPorHorario.values()) {
+            if (turmasNoHorario.size() == 1) {
+                // Sem conflito
+                turmasAceitas.add(turmasNoHorario.get(0));
+            } else {
+                // Há conflito - aplicar precedência
+                ClassGroup turmaVencedora = resolveConflictByPrecedence(turmasNoHorario);
+                if (turmaVencedora != null) {
+                    turmasAceitas.add(turmaVencedora);
+                }
+            }
+        }
+        
+        return turmasAceitas;
     }
     
     /**
-     * Obtém a precedência de uma disciplina
-     * 3 = Obrigatória (maior precedência)
-     * 2 = Eletiva
-     * 1 = Optativa (menor precedência)
+     * Agrupa turmas por horário
      */
-    private int getPrecedence(Subject disciplina) {
-        if (disciplina instanceof RequiredSubject) {
-            return 3;
-        } else if (disciplina instanceof ElectiveSubject) {
-            return 2;
-        } else if (disciplina instanceof OptionalSubject) {
-            return 1;
+    private Map<String, List<ClassGroup>> groupBySchedule(List<ClassGroup> turmas) {
+        Map<String, List<ClassGroup>> grupos = new HashMap<>();
+        
+        for (ClassGroup turma : turmas) {
+            String horario = turma.getSchedules().toString(); // Simplificado
+            grupos.computeIfAbsent(horario, k -> new ArrayList<>()).add(turma);
         }
-        return 0;
+        
+        return grupos;
     }
     
     /**
-     * Verifica se há conflito entre disciplinas de mesma precedência
+     * Resolve conflito baseado na precedência das disciplinas
+     * @param turmasConflitantes Lista de turmas no mesmo horário
+     * @return Turma com maior precedência, ou null se há conflito entre mesma precedência
+     * @throws ConflitoDeHorarioException se há conflito entre disciplinas de mesma precedência
      */
-    public boolean hasSamePrecedenceConflict(Set<Subject> disciplinas) {
-        if (disciplinas.size() <= 1) {
-            return false;
+    private ClassGroup resolveConflictByPrecedence(List<ClassGroup> turmasConflitantes) 
+            throws ConflitoDeHorarioException {
+        
+        if (turmasConflitantes.size() == 1) {
+            return turmasConflitantes.get(0);
         }
         
-        Set<Integer> precedencias = new HashSet<>();
-        for (Subject disciplina : disciplinas) {
-            precedencias.add(getPrecedence(disciplina));
+        // Encontrar a disciplina com maior precedência
+        ClassGroup turmaVencedora = null;
+        int maiorPrecedencia = Integer.MAX_VALUE;
+        
+        for (ClassGroup turma : turmasConflitantes) {
+            int precedencia = turma.getSubject().getPrecedence();
+            if (precedencia < maiorPrecedencia) {
+                maiorPrecedencia = precedencia;
+                turmaVencedora = turma;
+            }
         }
         
-        // Se há apenas uma precedência, não há conflito
-        return precedencias.size() == 1;
-    }
-    
-    /**
-     * Obtém a disciplina com maior precedência de um conjunto
-     */
-    public Subject getHighestPrecedenceSubject(Set<Subject> disciplinas) {
-        if (disciplinas.isEmpty()) {
-            return null;
+        // Verificar se há múltiplas disciplinas com a mesma precedência
+        List<ClassGroup> turmasMesmaPrecedencia = new ArrayList<>();
+        for (ClassGroup turma : turmasConflitantes) {
+            if (turma.getSubject().getPrecedence() == maiorPrecedencia) {
+                turmasMesmaPrecedencia.add(turma);
+            }
         }
         
-        return disciplinas.stream()
-                .max((d1, d2) -> Integer.compare(getPrecedence(d1), getPrecedence(d2)))
-                .orElse(null);
-    }
-    
-    /**
-     * Filtra disciplinas por tipo
-     */
-    public List<Subject> filterByType(Set<Subject> disciplinas, Class<? extends Subject> tipo) {
-        return disciplinas.stream()
-                .filter(tipo::isInstance)
-                .toList();
+        // Se há mais de uma disciplina com a mesma precedência, há conflito
+        if (turmasMesmaPrecedencia.size() > 1) {
+            throw new ConflitoDeHorarioException(
+                "Conflito entre disciplinas de mesma precedência: " + 
+                turmasMesmaPrecedencia.stream()
+                    .map(t -> t.getSubject().getCode() + " (" + t.getSubject().getType() + ")")
+                    .reduce("", (a, b) -> a + ", " + b)
+            );
+        }
+        
+        return turmaVencedora;
     }
 } 

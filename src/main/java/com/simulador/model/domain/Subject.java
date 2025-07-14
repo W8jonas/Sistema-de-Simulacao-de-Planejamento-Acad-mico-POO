@@ -9,12 +9,14 @@ public abstract class Subject {
     private final String name;
     private final int weeklyHours;
     private Set<ValidadorPreRequisito> validadores;
+    private Set<Subject> coRequisitos; // Lista de co-requisitos
 
     protected Subject(String code, String name, int weeklyHours) {
         this.code = code;
         this.name = name;
         this.weeklyHours = weeklyHours;
         this.validadores = new HashSet<>();
+        this.coRequisitos = new HashSet<>();
     }
 
     public String getCode() {
@@ -31,6 +33,22 @@ public abstract class Subject {
 
     public Set<ValidadorPreRequisito> getValidadores() {
         return validadores;
+    }
+    
+    public Set<Subject> getCoRequisitos() {
+        return coRequisitos;
+    }
+    
+    public void addCoRequisito(Subject coRequisito) {
+        this.coRequisitos.add(coRequisito);
+    }
+    
+    public void removeCoRequisito(Subject coRequisito) {
+        this.coRequisitos.remove(coRequisito);
+    }
+    
+    public boolean hasCoRequisitos() {
+        return !coRequisitos.isEmpty();
     }
 
     public void setValidadores(ValidadorPreRequisito validador) {
@@ -62,4 +80,17 @@ public abstract class Subject {
     public String toString() {
         return code + " - " + name;
     }
+    
+    /**
+     * Retorna o tipo da disciplina (Obrigatória, Eletiva, Optativa)
+     */
+    public abstract String getType();
+    
+    /**
+     * Retorna a precedência da disciplina para resolução de conflitos
+     * 1 = Obrigatória (maior precedência)
+     * 2 = Eletiva (precedência média)
+     * 3 = Optativa (menor precedência)
+     */
+    public abstract int getPrecedence();
 }

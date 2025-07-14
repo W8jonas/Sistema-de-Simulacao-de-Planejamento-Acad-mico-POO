@@ -85,7 +85,7 @@ public class ValidadorSimplesTest {
     @DisplayName("Validar disciplina sem pré-requisitos")
     void testValidarDisciplinaSemPreRequisitos() {
         // ARRANGE: Disciplina sem pré-requisitos
-        Subject disciplinaSemPreRequisitos = new RequiredSubject("DCC119", "Algoritmos", 4);
+        Subject disciplinaSemPreRequisitos = new RequiredSubject("DCC197", "VISÃO COMPUTACIONAL", 4);
         
         // ACT: Validar
         boolean resultado = validador.validar(aluno, disciplinaSemPreRequisitos);
@@ -165,7 +165,7 @@ public class ValidadorSimplesTest {
     @DisplayName("Validar com disciplina opcional como pré-requisito")
     void testValidarComDisciplinaOpcional() {
         // ARRANGE: Pré-requisito é uma disciplina opcional
-        Subject disciplinaOpcional = new OptionalSubject("DCC888", "Seminários", 2);
+        Subject disciplinaOpcional = new OptionalSubject("D133", "introducao a sistemas de informação", 2);
         ValidadorSimples validadorOpcional = new ValidadorSimples(disciplinaOpcional);
         aluno.addCompletedSubject(disciplinaOpcional, 7.5);
         
@@ -180,7 +180,7 @@ public class ValidadorSimplesTest {
     @DisplayName("Validar com múltiplas disciplinas no histórico")
     void testValidarComMultiplasDisciplinas() {
         // ARRANGE: Aluno tem várias disciplinas no histórico, incluindo o pré-requisito
-        Subject outraDisciplina = new RequiredSubject("DCC119", "Algoritmos", 4);
+        Subject outraDisciplina = new RequiredSubject("DCC197", "VISÃO COMPUTACIONAL", 4);
         aluno.addCompletedSubject(outraDisciplina, 9.0);
         aluno.addCompletedSubject(disciplinaPreRequisito, 7.5);
         
