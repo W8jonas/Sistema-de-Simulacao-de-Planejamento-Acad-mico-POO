@@ -21,7 +21,7 @@ public class CargaHorariaExcedidaExceptionTest {
         disciplina1 = new RequiredSubject("MAT154", "Cálculo I", 4);
         disciplina2 = new RequiredSubject("MAT155", "Geometria Analítica", 4);
         disciplina3 = new ElectiveSubject("DCC119", "Algoritmos", 4);
-        disciplina4 = new OptionalSubject("ART100", "Arte", 2);
+        disciplina4 = new OptionalSubject("DCC100", "Seminários", 2);
     }
     
     @Test
@@ -138,10 +138,10 @@ public class CargaHorariaExcedidaExceptionTest {
     @DisplayName("Deve lançar exceção com múltiplas disciplinas pequenas")
     void testExcecaoMultiplasDisciplinasPequenas() throws CargaHorariaExcedidaException {
         // ARRANGE: Adiciona disciplinas pequenas até exceder
-        Subject disciplinaPequena1 = new OptionalSubject("ART100", "Arte", 2);
-        Subject disciplinaPequena2 = new OptionalSubject("MUS100", "Música", 2);
-        Subject disciplinaPequena3 = new OptionalSubject("DAN100", "Dança", 2);
-        Subject disciplinaPequena4 = new OptionalSubject("TEAT100", "Teatro", 2);
+        Subject disciplinaPequena1 = new OptionalSubject("DCC100", "Seminários", 2);
+        Subject disciplinaPequena2 = new OptionalSubject("DCC100", "Seminários", 2);
+        Subject disciplinaPequena3 = new OptionalSubject("DCC101", "Introdução à Programação", 2);
+        Subject disciplinaPequena4 = new OptionalSubject("DCC102", "Metodologia", 2);
         
         aluno.addToFuturePlanning(disciplinaPequena1); // 2h
         aluno.addToFuturePlanning(disciplinaPequena2); // 2h
@@ -150,7 +150,7 @@ public class CargaHorariaExcedidaExceptionTest {
         
         // ACT & ASSERT: Deve lançar exceção ao tentar adicionar mais uma
         assertThrows(CargaHorariaExcedidaException.class, () -> {
-            Subject disciplinaPequena5 = new OptionalSubject("CIN100", "Cinema", 2);
+            Subject disciplinaPequena5 = new OptionalSubject("DCC103", "Tópicos Especiais", 2);
             aluno.addToFuturePlanning(disciplinaPequena5); // +2h (total: 10h)
         }, "Deve lançar exceção com múltiplas disciplinas pequenas");
     }

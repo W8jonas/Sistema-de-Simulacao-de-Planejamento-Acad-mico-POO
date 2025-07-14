@@ -54,12 +54,10 @@ public class ServicoMatricula {
     public RelatorioSimulacao planejar(Student aluno, Set<ClassGroup> turmasDesejadas) {
         RelatorioSimulacao relatorio = new RelatorioSimulacao(aluno);
         
-        // Validações básicas
         if (aluno == null) {
             relatorio.adicionarErro("Aluno não pode ser nulo");
             return relatorio;
         }
-        
         if (turmasDesejadas == null || turmasDesejadas.isEmpty()) {
             relatorio.adicionarErro("Deve ser fornecido pelo menos uma turma para planejamento");
             return relatorio;
@@ -67,51 +65,74 @@ public class ServicoMatricula {
         
         // Verificar conflitos de horário entre as turmas
         List<String> conflitosHorario = verificarConflitosHorario(turmasDesejadas);
+        Set<ClassGroup> turmasComConflito = new HashSet<>();
         if (!conflitosHorario.isEmpty()) {
             for (String conflito : conflitosHorario) {
                 relatorio.adicionarErro("Conflito de horário: " + conflito);
+                // Marcar as turmas envolvidas no conflito
+                String[] partes = conflito.split(" ");
+                if (partes.length >= 4) {
+                    String id1 = partes[0].substring(partes[0].indexOf("(") + 1, partes[0].indexOf(")"));
+                    String id2 = partes[3].substring(partes[3].indexOf("(") + 1, partes[3].indexOf(")"));
+                    for (ClassGroup turma : turmasDesejadas) {
+                        if (turma.getId().equals(id1) || turma.getId().equals(id2)) {
+                            turmasComConflito.add(turma);
+                        }
+                    }
+                }
             }
         }
         
-        // Verificar pré-requisitos para cada disciplina
+        int cargaHorariaAcumulada = aluno.getFuturePlanningWeeklyHours();
         for (ClassGroup turma : turmasDesejadas) {
             Subject disciplina = turma.getSubject();
+            boolean aceita = true;
+            String motivoRejeicao = "";
             
-            // Verificar se o aluno já cursou esta disciplina
+            // Se está em conflito, rejeita
+            if (turmasComConflito.contains(turma)) {
+                aceita = false;
+                motivoRejeicao = "Conflito de horário";
+            }
+            // Se já cursou, apenas avisa
             if (aluno.hasCompletedSubject(disciplina)) {
-                relatorio.adicionarAviso("Aluno já cursou esta disciplina: " + disciplina.getCode() + " - " + disciplina.getName() + 
-                                       " (Nota: " + aluno.getGrade(disciplina) + ")");
+                relatorio.adicionarAviso("Aluno já cursou esta disciplina: " + disciplina.getCode() + " - " + disciplina.getName() + " (Nota: " + aluno.getGrade(disciplina) + ")");
             }
-            
-            List<String> errosPreRequisitos = verificarPreRequisitos(aluno, disciplina);
-            
-            for (String erro : errosPreRequisitos) {
-                relatorio.adicionarErro("Pré-requisito não atendido para " + disciplina.getCode() + ": " + erro);
+            // Pré-requisitos
+            List<String> errosPre = verificarPreRequisitos(aluno, disciplina);
+            if (!errosPre.isEmpty()) {
+                aceita = false;
+                motivoRejeicao = String.join("; ", errosPre);
             }
-        }
-        
-        // Verificar carga horária semanal
-        int cargaHorariaTotal = calcularCargaHorariaTotal(turmasDesejadas);
-        if (cargaHorariaTotal > aluno.getMaxWeeklyHours()) {
-            relatorio.adicionarErro("Carga horária semanal excede o limite: " + 
-                cargaHorariaTotal + "h > " + aluno.getMaxWeeklyHours() + "h");
-        }
-        
-        // Se não há erros, adicionar ao planejamento
-        if (relatorio.getErros().isEmpty()) {
-            for (ClassGroup turma : turmasDesejadas) {
+            // Capacidade da turma
+            if (!turma.hasAvailableSlots()) {
+                aceita = false;
+                motivoRejeicao = "Turma cheia";
+            }
+            // Carga horária
+            if (aceita && (cargaHorariaAcumulada + disciplina.getWeeklyHours() > aluno.getMaxWeeklyHours())) {
+                aceita = false;
+                motivoRejeicao = "Carga horária excedida";
+            }
+            // Adiciona ao relatório
+            if (aceita) {
                 try {
-                    aluno.addToFuturePlanning(turma.getSubject());
+                    aluno.addToFuturePlanning(disciplina);
                     relatorio.adicionarTurmaPlanejada(turma);
+                    cargaHorariaAcumulada += disciplina.getWeeklyHours();
                 } catch (CargaHorariaExcedidaException e) {
                     relatorio.adicionarErro("Carga horária excedida: " + e.getMessage());
                 }
-            }
-            if (relatorio.getErros().isEmpty()) {
-                relatorio.setSucesso(true);
+            } else {
+                relatorio.adicionarErro("Turma " + turma.getId() + " rejeitada: " + motivoRejeicao);
             }
         }
-        
+        // Status final
+        if (!relatorio.getTurmasPlanejadas().isEmpty()) {
+            relatorio.setSucesso(true);
+        } else {
+            relatorio.setSucesso(false);
+        }
         return relatorio;
     }
     
@@ -222,5 +243,49 @@ public class ServicoMatricula {
      */
     public ClassGroup getTurma(String id) {
         return turmasRepo.get(id);
+    }
+
+    /**
+     * Finaliza a simulação, atualizando o histórico acadêmico do aluno
+     * com as disciplinas que foram aceitas na simulação
+     */
+    public void finalizarSimulacao(RelatorioSimulacao relatorio, double nota) {
+        if (relatorio == null) {
+            throw new IllegalArgumentException("Relatório não pode ser nulo");
+        }
+        
+        if (nota < 0.0 || nota > 10.0) {
+            throw new IllegalArgumentException("Nota deve estar entre 0.0 e 10.0");
+        }
+        
+        Student aluno = relatorio.getAluno();
+        
+        // Adicionar disciplinas aceitas ao histórico do aluno
+        for (ClassGroup turma : relatorio.getTurmasPlanejadas()) {
+            Subject disciplina = turma.getSubject();
+            
+            // Verificar se o aluno já cursou esta disciplina
+            if (!aluno.hasCompletedSubject(disciplina)) {
+                aluno.addCompletedSubject(disciplina, nota);
+                System.out.println("✓ Disciplina " + disciplina.getCode() + " adicionada ao histórico com nota " + nota);
+            } else {
+                System.out.println("⚠ Disciplina " + disciplina.getCode() + " já estava no histórico (nota: " + aluno.getGrade(disciplina) + ")");
+            }
+        }
+        
+        // Limpar o planejamento futuro, já que as disciplinas foram cursadas
+        for (ClassGroup turma : relatorio.getTurmasPlanejadas()) {
+            aluno.removeFromFuturePlanning(turma.getSubject());
+        }
+        
+        System.out.println("✅ Simulação finalizada! Histórico acadêmico atualizado.");
+        System.out.println("Total de disciplinas adicionadas ao histórico: " + relatorio.getTurmasPlanejadas().size());
+    }
+    
+    /**
+     * Finaliza a simulação com nota padrão 7.0
+     */
+    public void finalizarSimulacao(RelatorioSimulacao relatorio) {
+        finalizarSimulacao(relatorio, 7.0);
     }
 } 

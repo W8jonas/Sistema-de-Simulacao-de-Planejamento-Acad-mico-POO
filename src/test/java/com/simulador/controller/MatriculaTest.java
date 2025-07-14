@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Map;
 
 /**
  * Teste obrigatório: Matrícula bem-sucedida em uma turma quando todos os requisitos são atendidos
@@ -134,5 +137,47 @@ public class MatriculaTest {
         assertFalse(temConflitos, "Não deve haver conflitos de horário");
         
         System.out.println("✓ Teste de ausência de conflitos passou!");
+    }
+
+    @Test
+    @DisplayName("Teste de finalização da simulação com atualização do histórico")
+    void testFinalizarSimulacao() {
+        // ARRANGE: Criar disciplinas e turmas
+        RequiredSubject calc1 = new RequiredSubject("MAT154", "Cálculo I", 4);
+        RequiredSubject calc2 = new RequiredSubject("MAT156", "Cálculo II", 4);
+        
+        Schedule horario1 = new Schedule(1, 8, 10);
+        Schedule horario2 = new Schedule(2, 14, 16);
+        
+        ClassGroup turma1 = new ClassGroup("MAT154-01", calc1, 30, Arrays.asList(horario1));
+        ClassGroup turma2 = new ClassGroup("MAT156-01", calc2, 30, Arrays.asList(horario2));
+        
+        // Aluno sem histórico
+        Student aluno = new Student("João Silva", "202365085D", 20);
+        
+        // Configurar pré-requisitos
+        calc2.setValidadores(new ValidadorSimples(calc1));
+        
+        // ACT: Planejar matrícula
+        Set<ClassGroup> turmasDesejadas = new HashSet<>(Arrays.asList(turma1, turma2));
+        RelatorioSimulacao relatorio = registration.getServicoMatricula().planejar(aluno, turmasDesejadas);
+        
+        // Verificar que apenas Cálculo I foi aceito (sem pré-requisitos)
+        assertEquals(1, relatorio.getTurmasPlanejadas().size(), "Apenas Cálculo I deve ser aceito");
+        assertTrue(relatorio.temErros(), "Deve ter erros (Cálculo II rejeitado por pré-requisito)");
+        
+        // Finalizar simulação
+        registration.getServicoMatricula().finalizarSimulacao(relatorio, 8.5);
+        
+        // ASSERT: Verificar se o histórico foi atualizado
+        assertTrue(aluno.hasCompletedSubject(calc1), "Cálculo I deve estar no histórico");
+        assertEquals(8.5, aluno.getGrade(calc1), "Nota de Cálculo I deve ser 8.5");
+        assertFalse(aluno.hasCompletedSubject(calc2), "Cálculo II não deve estar no histórico (foi rejeitado)");
+        
+        System.out.println("? Teste de finalização da simulação passou!");
+        System.out.println("Histórico do aluno após finalização:");
+        for (Map.Entry<Subject, Double> entry : aluno.getCompletedSubjects().entrySet()) {
+            System.out.println("  " + entry.getKey().getCode() + " - Nota: " + entry.getValue());
+        }
     }
 } 

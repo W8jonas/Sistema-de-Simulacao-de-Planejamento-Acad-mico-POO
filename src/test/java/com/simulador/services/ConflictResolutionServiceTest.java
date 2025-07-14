@@ -22,10 +22,10 @@ public class ConflictResolutionServiceTest {
         service = new ConflictResolutionService();
         disciplinaObrigatoria = new RequiredSubject("MAT154", "Cálculo I", 4);
         disciplinaEletiva = new ElectiveSubject("DCC119", "Algoritmos", 4);
-        disciplinaOptativa = new OptionalSubject("ART100", "Arte", 2);
+        disciplinaOptativa = new OptionalSubject("DCC100", "Seminários", 2);
         disciplinaObrigatoria2 = new RequiredSubject("MAT155", "Geometria Analítica", 4);
-        disciplinaEletiva2 = new ElectiveSubject("DCC120", "Estruturas de Dados", 4);
-        disciplinaOptativa2 = new OptionalSubject("MUS100", "Música", 2);
+        disciplinaEletiva2 = new ElectiveSubject("DCC120", "Laboratório de Programação", 4);
+        disciplinaOptativa2 = new OptionalSubject("DCC101", "Introdução à Programação", 2);
     }
     
     @Test
