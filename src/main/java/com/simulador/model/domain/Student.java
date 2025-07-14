@@ -15,6 +15,7 @@ public class Student {
     private int maxWeeklyHours;
     private Set<Subject> futurePlanning; // planejamento futuro
     private Map<Subject, Subject> coRequisitos; // mapeamento de co-requisitos
+    private int creditosAcumulados; // créditos acumulados pelo estudante
 
     public Student(String name, String registration, int maxWeeklyHours) {
         this.name = name;
@@ -23,6 +24,7 @@ public class Student {
         this.completedSubjects = new HashMap<>();
         this.futurePlanning = new HashSet<>();
         this.coRequisitos = new HashMap<>();
+        this.creditosAcumulados = 0;
     }
 
     // Getters básicos
@@ -46,9 +48,29 @@ public class Student {
         return futurePlanning;
     }
 
+    /**
+     * Obtém os créditos acumulados pelo estudante
+     */
+    public int getCreditosAcumulados() {
+        return creditosAcumulados;
+    }
+
+    /**
+     * Calcula os créditos baseado nas horas semanais
+     * Relação: 4 horas = 4 créditos, 2 horas = 2 créditos, etc.
+     */
+    private int calcularCreditos(int horasSemanais) {
+        return horasSemanais; // A relação é 1:1 (1 hora = 1 crédito)
+    }
+
     // Adiciona uma disciplina cursada com sua nota
     public void addCompletedSubject(Subject subject, double grade) {
         completedSubjects.put(subject, grade);
+        
+        // Se a nota for >= 6.0 (aprovado), adiciona os créditos
+        if (grade >= 6.0) {
+            creditosAcumulados += calcularCreditos(subject.getWeeklyHours());
+        }
     }
 
     // Verifica se o estudante cursou uma disciplina específica

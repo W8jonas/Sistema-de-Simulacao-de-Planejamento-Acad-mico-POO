@@ -106,10 +106,18 @@ public class Registration {
             new ValidadorSimples(estruturaDados),
             new ValidadorSimples(orientacaoObjetos)
         );
-        metodologiaCientifica.setValidadores(new ValidadorLogicoAND(preRequisitosMetodologia));
         
-        // Monografia Final: requer DCC123 (ValidadorSimples)
-        monografiaFinal.setValidadores(new ValidadorSimples(metodologiaCientifica));
+        // Adicionar validador de créditos mínimos para Metodologia Científica
+        List<ValidadorPreRequisito> validadoresMetodologia = new ArrayList<>(preRequisitosMetodologia);
+        validadoresMetodologia.add(new ValidadorCreditosMinimos(34));
+        metodologiaCientifica.setValidadores(new ValidadorLogicoAND(validadoresMetodologia));
+        
+        // Monografia Final: requer DCC123 E pelo menos 34 créditos
+        List<ValidadorPreRequisito> validadoresMonografia = Arrays.asList(
+            new ValidadorSimples(metodologiaCientifica),
+            new ValidadorCreditosMinimos(34)
+        );
+        monografiaFinal.setValidadores(new ValidadorLogicoAND(validadoresMonografia));
         
         // Registrar todas as disciplinas
         servicoMatricula.registrarDisciplina(calculoI);
@@ -230,6 +238,16 @@ public class Registration {
         aluno.addCompletedSubject(algoritmos, 9.0);
         aluno.addCompletedSubject(introducaoExatas, 8.0); // ICE001 já cursada
         aluno.addCompletedSubject(labIntroFisica, 8.0); // FIS122 já cursada
+        
+        // Adicionar mais disciplinas para atingir 34 créditos
+        aluno.addCompletedSubject(calculoII, 7.5);
+        aluno.addCompletedSubject(fisicaI, 8.0);
+        aluno.addCompletedSubject(labProgramacao, 9.0);
+        aluno.addCompletedSubject(estruturaDados, 8.5);
+        aluno.addCompletedSubject(orientacaoObjetos, 8.0);
+        aluno.addCompletedSubject(quimicaFundamental, 7.5);
+        aluno.addCompletedSubject(laboratorioQuimica, 8.0);
+        aluno.addCompletedSubject(labFisicaI, 8.5);
         
         // Registrar aluno
         servicoMatricula.registrarAluno(aluno);
